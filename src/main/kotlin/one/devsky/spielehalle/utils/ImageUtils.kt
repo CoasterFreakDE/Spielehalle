@@ -53,7 +53,7 @@ object ImageUtils {
         g2d.font = font
         g2d.color = Color.WHITE
 
-        drawText(g2d, "${guild.members.size} Mitglieder", 28, iWidth, height - 140, true)
+        drawText(g2d, "${guild.memberCount} Mitglieder", 28, iWidth, height - 140, true)
         drawText(g2d, "Ein riesen Danke an unsere Booster <3", 28, 10, height - 140)
 
         val avatarWidth = 64
