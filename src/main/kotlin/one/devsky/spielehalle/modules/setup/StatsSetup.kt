@@ -27,7 +27,7 @@ class StatsSetup(private val channel: TextChannel) : PanelCreation {
                 Button.secondary("statistics.user", "Deine Statistiken")
                     .withEmoji(Emoji.fromFormatted("📊")),
             )
-            .addFiles(FileUpload.fromData(getResource("assets/statistics.png"), "statistics.png"))
+            .addFiles(FileUpload.fromData(getResource("assets/games/statistics.png"), "statistics.png"))
             .queue()
     }
 }
