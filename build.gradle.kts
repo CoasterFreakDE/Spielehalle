@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "2.0.0-Beta2"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    kotlin("plugin.serialization") version "2.0.0-Beta2"
+    kotlin("plugin.serialization") version "2.0.255-SNAPSHOT"
     id("org.sonarqube") version "4.4.1.3373"
     id("maven-publish")
 }
