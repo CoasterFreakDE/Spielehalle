@@ -33,12 +33,10 @@ object ImageUtils {
         g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE)
 
 
-        // register font
-        val fontFile = File(getResource("assets/fonts/MediaPro.ttf").toString())
-        val mediaPro = Font.createFont(Font.TRUETYPE_FONT, fontFile)
-
-        // Bilder hinzufügen
-        val bgImage = ImageIO.read(File(getResource("assets/banner/banner.png").toString()))
+        val fontStream = javaClass.getResourceAsStream("/assets/fonts/MediaPro.ttf")
+        val mediaPro = Font.createFont(Font.TRUETYPE_FONT, fontStream)
+        val imageStream = javaClass.getResourceAsStream("/assets/banner/banner.png")
+        val bgImage = ImageIO.read(imageStream)
 
         g2d.drawImage(bgImage, 0, 0, null)
 
