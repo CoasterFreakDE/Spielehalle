@@ -4,6 +4,7 @@ import dev.fruxz.ascend.tool.time.calendar.Calendar
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import one.devsky.spielehalle.db.cache.casino.CasinoCache
 import one.devsky.spielehalle.db.cache.users.CasinoUserCache
 import one.devsky.spielehalle.extensions.asCodeBlock
 import one.devsky.spielehalle.extensions.toInt
@@ -55,6 +56,7 @@ class CoinflipButtonListener: ListenerAdapter() {
             xp = casinoUser.xp + if (result) 3 else 1
         )
         CasinoUserCache.saveUser(casinoUser)
+        CasinoCache.modifyMoney(if (result) -5.0 else 5.0)
 
         replyEmbeds(embed).setEphemeral(true).queue()
     }

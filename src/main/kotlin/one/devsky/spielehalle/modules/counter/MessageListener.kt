@@ -1,11 +1,14 @@
 package one.devsky.spielehalle.modules.counter
 
+import dev.fruxz.ascend.extension.data.randomInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import one.devsky.spielehalle.db.cache.casino.CasinoCache
+import one.devsky.spielehalle.db.cache.users.CasinoUserCache
 import one.devsky.spielehalle.openai.OpenAIHandler
 import one.devsky.spielehalle.utils.Environment
 import one.devsky.spielehalle.utils.TempStorage
@@ -25,7 +28,6 @@ class MessageListener : ListenerAdapter() {
 
     override fun onMessageReceived(event: MessageReceivedEvent) {
         if (event.author.isBot) return
-
         if (event.channel.id != Environment.getEnv("CHANNEL_COUNTER")) return
 
         if (event.message.author.id == TempStorage.readTempFileAsString(counterAuthorKey) && event.message.author.id != Environment.getEnv("DEV_USER")) {
@@ -35,14 +37,27 @@ class MessageListener : ListenerAdapter() {
                 message.delete().queueAfter(5, TimeUnit.SECONDS)
             }
             event.message.delete().queueAfter(5, TimeUnit.SECONDS)
-
-
             return
         }
+
+        var casinoUser = CasinoUserCache.getUser(event.author.id)
+        if (casinoUser.money < 1.0) {
+            event.message.addReaction(Emoji.fromUnicode("🛑")).queue()
+
+            event.message.reply("Du hast leider nicht genug Guthaben zum mitmachen!").queue { message ->
+                message.delete().queueAfter(5, TimeUnit.SECONDS)
+            }
+            event.message.delete().queueAfter(5, TimeUnit.SECONDS)
+            return
+        }
+        casinoUser = casinoUser.copy(money = casinoUser.money - 1, xp = casinoUser.xp + 1)
+        CasinoCache.modifyMoney(1.0)
+
 
         val number = event.message.contentStripped.toIntOrNull() ?: return run {
             event.message.addReaction(Emoji.fromUnicode("⁉️")).queue()
             event.message.reply("Sicher, dass das eine Zahl ist? 🤨").queue()
+            CasinoUserCache.saveUser(casinoUser.copy(losses = casinoUser.losses + 1))
         }
 
         val lastNumber = TempStorage.readTempFileAsString("counter").toIntOrNull() ?: 0
@@ -51,9 +66,32 @@ class MessageListener : ListenerAdapter() {
             event.message.addReaction(Emoji.fromUnicode("✅")).queue()
             TempStorage.saveTempFile("counter", number.toString())
             TempStorage.saveTempFile(counterAuthorKey, event.author.id)
+
+            if (number % 10 == 0) {
+                CasinoUserCache.saveUser(casinoUser.copy(money = casinoUser.money + 5, winnings = casinoUser.winnings + 5, xp = casinoUser.xp + 10))
+                CasinoCache.modifyMoney(-5.0)
+                event.message.addReaction(Emoji.fromUnicode("💰")).queue()
+                event.message.reply("Du hast eine runde Zahl erreicht! Du bekommst $5 und 10 XP!").queue { message ->
+                    message.delete().queueAfter(5, TimeUnit.SECONDS)
+                }
+                return
+            }
+
+            if (number % randomInt(5.. 20) == 0) {
+                CasinoUserCache.saveUser(casinoUser.copy(money = casinoUser.money + 25, winnings = casinoUser.winnings + 25, xp = casinoUser.xp + 20))
+                CasinoCache.modifyMoney(-25.0)
+                event.message.addReaction(Emoji.fromUnicode("⚱️")).queue()
+                event.message.reply("Herzlichen Glückwunsch. Du hast ein Paket gefunden. Du bekommst $25 und 20 XP!").queue { message ->
+                    message.delete().queueAfter(5, TimeUnit.SECONDS)
+                }
+                return
+            }
+
+            CasinoUserCache.saveUser(casinoUser.copy(losses = casinoUser.losses + 1))
             return
         }
 
+        CasinoUserCache.saveUser(casinoUser.copy(losses = casinoUser.losses + 1))
         event.message.addReaction(Emoji.fromUnicode("❌")).queue()
 
         TempStorage.saveTempFile("counter", "0")
