@@ -33,10 +33,14 @@ class BannerChanger(private val jda: JDA) {
                 val avatars = boosters.also { getLogger().info("Found ${it.size} boosters") }.mapNotNull { it.user.avatarUrl }
                 getLogger().info("Found ${avatars.size} avatars")
 
-                val image =
-                    ImageUtils.generateBanner(guild, avatars)
+                try {
+                    val image =
+                        ImageUtils.generateBanner(guild, avatars)
 
-                guild.manager.setBanner(Icon.from(image)).queue()
+                    guild.manager.setBanner(Icon.from(image)).queue()
+                } catch (e: Exception) {
+                    getLogger().error("Error while generating banner", e)
+                }
             }.onError {
                 getLogger().error("Error while fetching boosters", it)
             }

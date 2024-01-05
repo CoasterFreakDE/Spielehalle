@@ -3,6 +3,7 @@ package one.devsky.spielehalle.utils
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import dev.fruxz.ascend.tool.time.calendar.Calendar
+import one.devsky.spielehalle.db.tables.users.CasinoUserTable
 import one.devsky.spielehalle.extensions.getLogger
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -44,7 +45,7 @@ internal object DatabaseConnection {
         getLogger().info("Check for table updates...")
         transaction {
             SchemaUtils.createMissingTablesAndColumns(
-
+                CasinoUserTable
             )
         }
 

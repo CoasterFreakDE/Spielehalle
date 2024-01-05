@@ -24,3 +24,13 @@ fun ReplyCallbackAction.private() = this.setEphemeral(true)
 fun <T> RestAction<T>?.queueAfter(duration: Duration) {
     this?.queueAfter(duration.inWholeMilliseconds, TimeUnit.MILLISECONDS)
 }
+
+/**
+ * Converts the current string into a code block.
+ *
+ * @param language The optional language for the code block. Defaults to an empty string.
+ * @return The current string surrounded by code block backticks.
+ */
+fun String?.asCodeBlock(language: String = "") = "```$language\n$this\n```"
+
+fun Any?.asCodeBlock(language: String = "") = "```$language\n$this\n```"
