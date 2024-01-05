@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.utils.cache.CacheFlag
 import one.devsky.spielehalle.extensions.getLogger
 import one.devsky.spielehalle.modules.banner.BannerChanger
+import one.devsky.spielehalle.modules.stats.VoiceListener
 import one.devsky.spielehalle.modules.status.StatusChanger
 import one.devsky.spielehalle.utils.DatabaseConnection
 import one.devsky.spielehalle.utils.Environment
@@ -59,6 +60,7 @@ class Spielehalle {
             getLogger().info("Shutting down...")
             bannerChanger.stop()
             statusChanger.stop()
+            VoiceListener.onShutdown()
             jda.shutdown()
             DatabaseConnection.disconnect()
         }.apply { isDaemon = true })

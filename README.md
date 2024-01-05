@@ -1,6 +1,6 @@
 <br />
 <div align="center">
-  <a href="https://discord.gg/PEqVSTwy2K">
+  <a href="https://discord.gg/CakNvTBaGc">
     <img src=".github/assets/banner.png" alt="Logo">
   </a>
 
@@ -12,7 +12,7 @@
     <a href="https://discord.com/users/216487432667791360"><strong>Contact »</strong></a>
     <br />
     <br />
-    <a href="https://discord.gg/PEqVSTwy2K">MainServer</a>
+    <a href="https://discord.gg/CakNvTBaGc">MainServer</a>
   </p>
 
 <br />

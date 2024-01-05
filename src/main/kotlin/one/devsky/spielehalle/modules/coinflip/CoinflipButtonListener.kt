@@ -35,11 +35,13 @@ class CoinflipButtonListener: ListenerAdapter() {
             return
         }
 
-        val result = (0..1).random() == head.toInt()
+        val winningRnd = (0..1).random()
+        val result = winningRnd == head.toInt()
+        val winner = if (winningRnd == 1) "Kopf" else "Zahl"
 
         val embed = EmbedBuilder()
             .setColor(0xef5777)
-            .setTitle("Coinflip")
+            .setTitle("Coinflip - $winner")
             .setDescription("Du hast ${if (result) "gewonnen" else "verloren"}!")
             .addField("Gewinn", "$${if (result) 5 else -5}".asCodeBlock(), true)
             .addField("Guthaben", "$${casinoUser.money + if (result) 5 else -5}".asCodeBlock(), true)
