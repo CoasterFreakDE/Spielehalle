@@ -52,7 +52,7 @@ class MessageListener : ListenerAdapter() {
             return
         }
         casinoUser = casinoUser.copy(money = casinoUser.money - 1, xp = casinoUser.xp + 1)
-        CasinoCache.modifyMoney(1.0, Game.COUNTER)
+        CasinoCache.modifyMoney(1.0, Game.COUNTER, event.author)
 
 
         val number = event.message.contentStripped.toIntOrNull() ?: return run {
@@ -70,7 +70,7 @@ class MessageListener : ListenerAdapter() {
 
             if (number % 10 == 0) {
                 CasinoUserCache.saveUser(casinoUser.copy(money = casinoUser.money + 5, winnings = casinoUser.winnings + 5, xp = casinoUser.xp + 10))
-                CasinoCache.modifyMoney(-5.0, Game.COUNTER)
+                CasinoCache.modifyMoney(-5.0, Game.COUNTER, event.author)
                 event.message.addReaction(Emoji.fromUnicode("💰")).queue()
                 event.message.reply("Du hast eine runde Zahl erreicht! Du bekommst $5 und 10 XP!").queue { message ->
                     message.delete().queueAfter(5, TimeUnit.SECONDS)
@@ -80,7 +80,7 @@ class MessageListener : ListenerAdapter() {
 
             if (number % randomInt(5.. 50) == 0) {
                 CasinoUserCache.saveUser(casinoUser.copy(money = casinoUser.money + 25, winnings = casinoUser.winnings + 25, xp = casinoUser.xp + 20))
-                CasinoCache.modifyMoney(-25.0, Game.COUNTER)
+                CasinoCache.modifyMoney(-25.0, Game.COUNTER, event.author)
                 event.message.addReaction(Emoji.fromUnicode("⚱️")).queue()
                 event.message.reply("Herzlichen Glückwunsch. Du hast ein Paket gefunden. Du bekommst $25 und 20 XP!").queue { message ->
                     message.delete().queueAfter(5, TimeUnit.SECONDS)

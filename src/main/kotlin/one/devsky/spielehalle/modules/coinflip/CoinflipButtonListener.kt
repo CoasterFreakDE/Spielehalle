@@ -57,7 +57,7 @@ class CoinflipButtonListener: ListenerAdapter() {
             xp = casinoUser.xp + if (result) 3 else 1
         )
         CasinoUserCache.saveUser(casinoUser)
-        CasinoCache.modifyMoney(if (result) -5.0 else 5.0, Game.COINFLIP)
+        CasinoCache.modifyMoney(if (result) -5.0 else 5.0, Game.COINFLIP, user)
 
         replyEmbeds(embed).setEphemeral(true).queue()
     }

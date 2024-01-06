@@ -1,6 +1,7 @@
 package one.devsky.spielehalle.db.cache.casino
 
 import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.entities.User
 import one.devsky.spielehalle.Spielehalle
 import one.devsky.spielehalle.db.model.enums.Game
 import one.devsky.spielehalle.db.model.enums.LogType
@@ -42,7 +43,7 @@ object CasinoCache {
      *
      * @param amount The amount to be added to the current money value.
      */
-    fun modifyMoney(amount: Double, game: Game) {
+    fun modifyMoney(amount: Double, game: Game, user: User? = null) {
         cacheLock.writeLock().lock()
         money += amount
         TempStorage.saveTempFile("casino.money", money.toString())
@@ -54,12 +55,13 @@ object CasinoCache {
             EmbedBuilder()
                 .setColor(game.color + color)
                 .setDescription("Das Casinokonto wurde modifiziert.")
-                .addField("Amount", "$$amount".asCodeBlock(), true)
-                .addField("New amount", "$$money".asCodeBlock(), true)
-                .addField("Game",
+                .addField("Anzahl", "$$amount".asCodeBlock(), true)
+                .addField("CasinoKonto", "$$money".asCodeBlock(), true)
+                .addField("Spiel",
                     game.name.lowercase()
                         .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-                    .asCodeBlock(), true)
+                    .asCodeBlock(), false)
+                .addField("User", user?.asMention ?: "N/A", false)
                 .setFooter("Spielehalle | Logs", Spielehalle.instance.jda.selfUser.avatarUrl),
             logType = LogType.CUSTOM
         )?.queue()
