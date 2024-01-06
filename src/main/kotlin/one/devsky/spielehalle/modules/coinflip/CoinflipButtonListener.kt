@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import one.devsky.spielehalle.db.cache.casino.CasinoCache
 import one.devsky.spielehalle.db.cache.users.CasinoUserCache
+import one.devsky.spielehalle.db.model.enums.Game
 import one.devsky.spielehalle.extensions.asCodeBlock
 import one.devsky.spielehalle.extensions.toInt
 import kotlin.time.Duration.Companion.seconds
@@ -56,7 +57,7 @@ class CoinflipButtonListener: ListenerAdapter() {
             xp = casinoUser.xp + if (result) 3 else 1
         )
         CasinoUserCache.saveUser(casinoUser)
-        CasinoCache.modifyMoney(if (result) -5.0 else 5.0)
+        CasinoCache.modifyMoney(if (result) -5.0 else 5.0, Game.COINFLIP)
 
         replyEmbeds(embed).setEphemeral(true).queue()
     }

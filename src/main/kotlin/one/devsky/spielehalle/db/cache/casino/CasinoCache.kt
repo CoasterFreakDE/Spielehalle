@@ -2,12 +2,14 @@ package one.devsky.spielehalle.db.cache.casino
 
 import net.dv8tion.jda.api.EmbedBuilder
 import one.devsky.spielehalle.Spielehalle
+import one.devsky.spielehalle.db.model.enums.Game
 import one.devsky.spielehalle.db.model.enums.LogType
 import one.devsky.spielehalle.extensions.asCodeBlock
+import one.devsky.spielehalle.extensions.plus
 import one.devsky.spielehalle.utils.Environment
 import one.devsky.spielehalle.utils.TempStorage
-import one.devsky.spielehalle.utils.sendLogAsEmbed
 import one.devsky.spielehalle.utils.sendLogEmbed
+import java.util.*
 import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
@@ -40,19 +42,26 @@ object CasinoCache {
      *
      * @param amount The amount to be added to the current money value.
      */
-    fun modifyMoney(amount: Double) {
+    fun modifyMoney(amount: Double, game: Game) {
         cacheLock.writeLock().lock()
         money += amount
         TempStorage.saveTempFile("casino.money", money.toString())
         cacheLock.writeLock().unlock()
 
+        val color = if (amount > 0) LogType.INFO.color else LogType.ERROR.color
+
         sendLogEmbed(
             EmbedBuilder()
+                .setColor(game.color + color)
                 .setDescription("Das Casinokonto wurde modifiziert.")
                 .addField("Amount", "$$amount".asCodeBlock(), true)
                 .addField("New amount", "$$money".asCodeBlock(), true)
+                .addField("Game",
+                    game.name.lowercase()
+                        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+                    .asCodeBlock(), true)
                 .setFooter("Spielehalle | Logs", Spielehalle.instance.jda.selfUser.avatarUrl),
-            logType = if (amount > 0) LogType.INFO else LogType.ERROR
+            logType = LogType.CUSTOM
         )?.queue()
     }
 }
