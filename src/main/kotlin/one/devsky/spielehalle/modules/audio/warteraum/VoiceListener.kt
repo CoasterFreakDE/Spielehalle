@@ -15,6 +15,7 @@ import one.devsky.spielehalle.extensions.getLogger
 import one.devsky.spielehalle.modules.audio.AudioPlayerManager
 import one.devsky.spielehalle.modules.audio.AudioPlayerSendHandler
 import one.devsky.spielehalle.utils.Environment
+import java.io.File
 
 class VoiceListener : ListenerAdapter() {
 
@@ -39,10 +40,7 @@ class VoiceListener : ListenerAdapter() {
         audioManager.sendingHandler = AudioPlayerSendHandler(AudioPlayerManager.audioPlayer)
         audioManager.openAudioConnection(channel)
 
-        val path = javaClass.getResource("/assets/sounds/FlashWarteraum.wav")?.path
-        if (path != null) {
-            AudioPlayerManager.playTrack(path)
-        }
+        AudioPlayerManager.playTrack(File("data/sounds/FlashWarteraum.wav").path)
     }
 
     private fun onLeaveVoice(channel: AudioChannelUnion) {
