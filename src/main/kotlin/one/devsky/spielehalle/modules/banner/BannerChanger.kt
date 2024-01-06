@@ -30,8 +30,7 @@ class BannerChanger(private val jda: JDA) {
             }
 
             guild.findMembers { it.isBoosting }.onSuccess { boosters ->
-                val avatars = boosters.also { getLogger().info("Found ${it.size} boosters") }.mapNotNull { it.user.avatarUrl }
-                getLogger().info("Found ${avatars.size} avatars")
+                val avatars = boosters.mapNotNull { it.user.avatarUrl }
 
                 try {
                     val image =

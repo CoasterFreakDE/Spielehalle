@@ -1,12 +1,10 @@
 package one.devsky.spielehalle.utils
 
-import dev.fruxz.ascend.extension.getResource
 import net.dv8tion.jda.api.entities.Guild
 import java.awt.*
 import java.awt.geom.Ellipse2D.Double
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.net.URI
 import javax.imageio.ImageIO
 
@@ -89,7 +87,7 @@ object ImageUtils {
         g2d.drawString(text, x - (if(leftBounded) textWidth else 0), y + (fm.ascent - fm.descent - fm.leading) / 2)
     }
 
-    fun roundAvatar(image: BufferedImage): BufferedImage {
+    private fun roundAvatar(image: BufferedImage): BufferedImage {
         val diameter = Math.min(image.width, image.height)
 
         val mask = BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_ARGB)
@@ -116,7 +114,7 @@ object ImageUtils {
         return masked
     }
 
-    fun Image.toBufferedImage(): BufferedImage {
+    private fun Image.toBufferedImage(): BufferedImage {
         val bufferedImage = BufferedImage(this.getWidth(null), this.getHeight(null), BufferedImage.TYPE_INT_ARGB)
         val g2 = bufferedImage.createGraphics()
         g2.drawImage(this, 0, 0, null)
