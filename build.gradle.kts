@@ -53,6 +53,8 @@ val shadowDependencies = listOf(
 
     "com.aallam.openai:openai-client:3.6.2",
     "io.ktor:ktor-client-cio:2.3.7",
+
+    "dev.arbjerg:lavaplayer:2.0.4"
 )
 
 dependencies {
