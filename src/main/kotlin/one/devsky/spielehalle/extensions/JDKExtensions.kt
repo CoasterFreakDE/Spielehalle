@@ -23,3 +23,23 @@ operator fun Color.plus(other: Color): Color {
         ((this.blue + other.blue) / 2).coerceAtMost(255)
     )
 }
+
+fun Int.times(text: String): String {
+    val builder = StringBuilder()
+    repeat(this) {
+        builder.append(text)
+    }
+    return builder.toString()
+}
+
+fun Int.times(function: (Int) -> Unit) {
+    repeat(this) {
+        function(it)
+    }
+}
+
+fun zeroArray(size: Int): Array<Int> {
+    val array = arrayOfNulls<Int>(size)
+    array.fill(0)
+    return array.requireNoNulls()
+}

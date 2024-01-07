@@ -13,7 +13,8 @@ class SetupCommandListener : ListenerAdapter(), HasSubcommands {
 
     private val panels = mapOf(
         "stats" to StatsSetup::class.java,
-        "coinflip" to CoinflipSetup::class.java
+        "coinflip" to CoinflipSetup::class.java,
+        "slots" to SlotSetup::class.java,
     )
 
     /**
