@@ -43,3 +43,28 @@ fun zeroArray(size: Int): Array<Int> {
     array.fill(0)
     return array.requireNoNulls()
 }
+
+
+
+/**
+ * Calculates the frequency of each element in the array.
+ *
+ * @return a map containing the elements of the array as keys and their frequencies as values.
+ * Only elements with a frequency greater than 1 are included in the map.
+ */
+val Array<Int>.same: Map<Int, Int>
+    get() {
+        // Index 1: Value
+        // Index 2: Amount of same values
+        val map = mutableMapOf<Int, Int>()
+        forEach { value ->
+            map[value] = (map[value] ?: 0) + 1
+        }
+        return map.filter { it.value > 1 }
+    }
+
+inline fun <reified T> Array<T>.shuffled(): Array<T> {
+    val list = toMutableList()
+    list.shuffle()
+    return list.toTypedArray()
+}

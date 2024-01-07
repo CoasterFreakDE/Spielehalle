@@ -31,5 +31,7 @@ object Emojis {
     val ZIEHEN = Emoji.fromCustom("ziehen", 1192605582906105856, false)
 
 
+    val DIAMOND = Emoji.fromFormatted("💎")
+
     val EMBED_BACKGROUND = Emoji.fromCustom("back", 1193606933068918945, false)
 }

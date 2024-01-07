@@ -18,6 +18,8 @@ interface SlotMachine: SinglePlayerGame {
 
 
     var message: Message?
+    var einsatz: Int
+    var autoRolls: Int
 
     fun updateMessage(showing: Int = 0): Unit
 }

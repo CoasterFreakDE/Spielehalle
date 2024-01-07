@@ -1,5 +1,6 @@
 package one.devsky.spielehalle.modules.slots.machines
 
+import dev.fruxz.ascend.extension.container.first
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -8,11 +9,15 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.emoji.Emoji
+import net.dv8tion.jda.api.interactions.components.ActionRow
 import net.dv8tion.jda.api.interactions.components.buttons.Button
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu
 import one.devsky.spielehalle.Spielehalle
-import one.devsky.spielehalle.extensions.asCodeBlock
-import one.devsky.spielehalle.extensions.times
-import one.devsky.spielehalle.extensions.zeroArray
+import one.devsky.spielehalle.db.cache.casino.CasinoCache
+import one.devsky.spielehalle.db.cache.users.CasinoUserCache
+import one.devsky.spielehalle.db.model.enums.Game
+import one.devsky.spielehalle.extensions.*
 import one.devsky.spielehalle.modules.slots.machines.interfaces.Reel
 import one.devsky.spielehalle.modules.slots.machines.interfaces.ReelSymbol
 import one.devsky.spielehalle.modules.slots.machines.interfaces.SlotMachine
@@ -29,10 +34,12 @@ class StardustSlots : SlotMachine {
         ReelSymbol("1", 1, Emojis.SLOT1),
         ReelSymbol("2", 2, Emojis.SLOT2),
         ReelSymbol("3", 3, Emojis.SLOT3),
-        ReelSymbol("4", 4, Emojis.SLOT4),
-        ReelSymbol("5", 5, Emojis.SLOT5),
-        ReelSymbol("6", 6, Emojis.SLOT6),
-        ReelSymbol("7", 7, Emojis.SLOT7),
+        ReelSymbol("4", 1, Emojis.SLOT4),
+        ReelSymbol("5", 2, Emojis.SLOT5),
+        ReelSymbol("6", 2, Emojis.SLOT6),
+        ReelSymbol("7", 3, Emojis.SLOT7),
+        ReelSymbol("Chip", 5, Emojis.CHIP),
+        ReelSymbol("Diamond", 10, Emojis.DIAMOND),
     )
 
     override val name: String
@@ -50,10 +57,10 @@ class StardustSlots : SlotMachine {
     override val reels: List<Reel>
         get() = listOf(
             reel,
-            reel,
-            reel,
-            reel,
-            reel
+            reel.shuffle(),
+            reel.shuffle(),
+            reel.shuffle(),
+            reel.shuffle()
         )
 
     override val rows: Int
@@ -64,6 +71,9 @@ class StardustSlots : SlotMachine {
     override var player: User? = null
     override var currentReelPositions: Array<Int> = zeroArray(reels.size)
     override var message: Message? = null
+    override var einsatz: Int = minBet
+    override var autoRolls: Int = 0
+    var lastWin: Int = 0
 
     private fun initMessage(): Boolean {
         val channel = Environment.getEnv("CHANNEL_SLOTS")?.let { Spielehalle.instance.jda.getTextChannelById(it) } ?: return false
@@ -95,16 +105,77 @@ class StardustSlots : SlotMachine {
         updateMessage()
 
         CoroutineScope(Dispatchers.Default).launch {
-            delay(5.seconds)
+            delay(10.seconds)
             for (i in reels.indices) {
                 currentReelPositions[i] = (0 until reels[i].symbols.size).random()
-                updateMessage(i + 1)
-                delay(3.seconds)
             }
+            updateMessage(99)
+            delay(10.seconds)
+            sendAuswertung()
+
+            if (autoRolls > 1) {
+                autoRolls--
+
+                val casinoUser = player?.id?.let { CasinoUserCache.getUser(it) } ?: return@launch
+                if (casinoUser.money < einsatz) {
+                    message?.channel?.sendMessage("AutoRoll von ${player!!.asMention} wurde abgebrochen. Dein Geld ist leer.")?.queue { msg ->
+                        msg.delete().queueAfter(10.seconds)
+                    }
+                    isRunning = false
+                    player = null
+                    updateMessage()
+                    return@launch
+                }
+                CasinoUserCache.saveUser(casinoUser.copy(money = casinoUser.money - einsatz.toDouble()))
+                CasinoCache.modifyMoney(einsatz.toDouble(), Game.SLOTS, player)
+
+                run()
+                return@launch
+            }
+            autoRolls = 0
             isRunning = false
             player = null
             updateMessage()
         }
+    }
+
+    private fun sendAuswertung() {
+        val same = currentReelPositions.same
+        val wins = when {
+            same.containsValue(5) -> {
+                val value = same[0] ?: return
+                reels[0].symbols[value].value * 10
+            }
+            same.containsValue(4) -> {
+                val value = same.first { it.value == 4 }.key
+                reels[0].symbols[value].value * 5
+            }
+            same.containsValue(3) -> {
+                val value = same.first { it.value == 3 }.key
+                reels[0].symbols[value].value * 2
+            }
+            else -> 0
+        } * einsatz
+
+        val casinoUser = player?.let { CasinoUserCache.getUser(it.id) } ?: return
+
+        if (wins > 0) {
+            lastWin = wins
+            CasinoCache.modifyMoney(-wins.toDouble(), Game.SLOTS, player)
+            CasinoUserCache.saveUser(casinoUser.copy(money = casinoUser.money + wins, winnings = casinoUser.winnings + wins))
+
+            val embed = EmbedBuilder()
+                .setColor(0x4bcffa)
+                .setDescription("Auswertung von ${player?.asMention}")
+                .addField("Gewinn", "$$wins".asCodeBlock(), true)
+                .build()
+
+            message?.channel?.sendMessageEmbeds(embed)?.queue { msg ->
+                msg.delete().queueAfter(10.seconds)
+            }
+            return
+        }
+        CasinoUserCache.saveUser(casinoUser.copy(losses = casinoUser.losses + einsatz))
     }
 
     override fun updateMessage(showing: Int) {
@@ -114,6 +185,14 @@ class StardustSlots : SlotMachine {
             .setDescription(description)
             .addField("Mindesteinsatz", "$${minBet}".asCodeBlock(), true)
             .addField("Höchsteinsatz", "$${maxBet}".asCodeBlock(), true)
+            .addField("Letzter Gewinn", "$${lastWin}".asCodeBlock(), true)
+            .also {
+                if(isRunning && player != null) {
+                    it.addField("Spieler", player!!.asMention, true)
+                    it.addField("Aktueller Einsatz", "$${einsatz}".asCodeBlock(), true)
+                    it.addField("AutoSpins", "$autoRolls".asCodeBlock(), true)
+                }
+            }
             .build()
 
         val embed2 = EmbedBuilder()
@@ -128,6 +207,8 @@ class StardustSlots : SlotMachine {
             ?.setActionRow(
                 Button.secondary("slots.${identifier}.play", "Spielen")
                     .withEmoji(Emojis.SLOTMACHINE),
+                Button.secondary("slots.${identifier}.stop", "Stop")
+                    .withEmoji(Emojis.STOPPEN),
                 Button.secondary("slots.${identifier}.info", "Info")
                     .withEmoji(Emojis.TERMINAL),
             )?.queue()

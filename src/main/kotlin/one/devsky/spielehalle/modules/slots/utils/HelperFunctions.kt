@@ -9,11 +9,6 @@ import kotlin.math.min
 fun SlotMachine.buildGame(running: Boolean = false, showing: Int = 0): String {
     val intent = 3.times(Emojis.EMBED_BACKGROUND.formatted)
     val builder = StringBuilder()
-
-    if(isRunning && player != null) {
-        builder.append("Es spielt: ${player!!.asMention}\n")
-    }
-
     val boxes = (reels.size + 2).times("⬛ ")
 
     builder.append("$intent$boxes\n")
