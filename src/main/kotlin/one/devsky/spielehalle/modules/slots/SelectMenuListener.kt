@@ -64,7 +64,11 @@ class SelectMenuListener : ListenerAdapter() {
             event.reply("Du hast nicht genug Geld!").setEphemeral(true).queue()
             return
         }
-        CasinoUserCache.saveUser(casinoUser.copy(money = casinoUser.money - bet))
+        CasinoUserCache.saveUser(casinoUser.copy(
+            money = casinoUser.money - bet,
+            xp = casinoUser.xp + 1,
+            gamesPlayed = casinoUser.gamesPlayed + 1
+        ))
         CasinoCache.modifyMoney(bet.toDouble(), Game.SLOTS, event.user)
 
         slotMachine.autoRolls = spins
