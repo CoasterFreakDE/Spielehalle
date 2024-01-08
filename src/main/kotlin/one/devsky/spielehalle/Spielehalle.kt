@@ -66,7 +66,7 @@ class Spielehalle {
         }.apply { isDaemon = true })
 
         jda.presence.setPresence(OnlineStatus.ONLINE, Activity.customStatus("🍀 Guten Morgen/Tag/Abend!"))
-        getLogger().info("Bot is ready! ${jda.selfUser.name} - ${jda.selfUser.id} on ${jda.guilds.size} guilds")
+        getLogger().info("Bot online. ${jda.selfUser.name} - ${jda.selfUser.id} on ${jda.guilds.size} guilds")
     }
 
 }
