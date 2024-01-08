@@ -20,7 +20,8 @@ class VoiceListener : ListenerAdapter() {
                 val xp = time.inWholeMinutes.toInt()
 
                 val casinoUser = CasinoUserCache.getUser(member)
-                CasinoUserCache.saveUser(casinoUser.copy(voiceTime = casinoUser.voiceTime + time, xp = casinoUser.xp + xp))
+                casinoUser.addEXP(xp)
+                CasinoUserCache.saveUser(casinoUser.copy(voiceTime = casinoUser.voiceTime + time))
                 getLogger().debug("User $member has been in voice for $time gaining $xp xp.")
             }
         }
@@ -46,7 +47,8 @@ class VoiceListener : ListenerAdapter() {
         val xp = time.inWholeMinutes.toInt()
 
         val casinoUser = CasinoUserCache.getUser(member.id)
-        CasinoUserCache.saveUser(casinoUser.copy(voiceTime = casinoUser.voiceTime + time, xp = casinoUser.xp + xp))
+        casinoUser.addEXP(xp)
+        CasinoUserCache.saveUser(casinoUser.copy(voiceTime = casinoUser.voiceTime + time))
         getLogger().debug("User ${member.user.name} has been in voice for $time gaining $xp xp.")
     }
 

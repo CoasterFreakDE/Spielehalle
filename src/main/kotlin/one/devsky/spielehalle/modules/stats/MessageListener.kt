@@ -20,6 +20,7 @@ class MessageListener : ListenerAdapter() {
         coolDowns[author.id] = Calendar.now() + 1.minutes
 
         val casinoUser = CasinoUserCache.getUser(author.id)
-        CasinoUserCache.saveUser(casinoUser.copy(messages = casinoUser.messages + 1, xp = casinoUser.xp + 1))
+        casinoUser.addEXP(1)
+        CasinoUserCache.saveUser(casinoUser.copy(messages = casinoUser.messages + 1))
     }
 }

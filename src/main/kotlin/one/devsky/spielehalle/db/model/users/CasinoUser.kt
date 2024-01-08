@@ -1,6 +1,10 @@
 package one.devsky.spielehalle.db.model.users
 
 import one.devsky.spielehalle.utils.Environment
+import one.devsky.spielehalle.utils.sendToChannel
+import kotlin.math.exp
+import kotlin.math.ln
+import kotlin.math.pow
 import kotlin.time.Duration
 
 /**
@@ -15,10 +19,33 @@ import kotlin.time.Duration
 data class CasinoUser(
     val clientId: String,
     val money: Double = Environment.getEnv("START_MONEY")?.toDouble() ?: 0.0,
-    val xp: Int = 0,
+    var xp: Int = 0,
     val messages: Int = 0,
     val voiceTime: Duration = Duration.ZERO,
     val winnings: Double = 0.0,
     val losses: Double = 0.0,
     val gamesPlayed: Int = 0,
-)
+) {
+
+    val level: Int
+        get() = ((this.xp.toDouble() / 100.toDouble()).pow(0.6)).toInt()
+
+    fun addEXP(exp: Int): Boolean {
+        val oldLevel = level
+        this.xp += exp
+        val curLevel = level
+        val rankup = curLevel > oldLevel
+
+        if(rankup) {
+            sendToChannel(guildEnv = "MAIN_GUILD", channelEnv = "CHANNEL_SYSTEM",
+                "<@${clientId}> ist ein Level aufgestiegen!\n" +
+                        "Neues Level: $level")
+                ?.queue()
+        }
+        return rankup
+    }
+
+    fun nextLevelExp(forLevel: Int = level+1): Long {
+        return (exp(ln(forLevel.toDouble()) / 0.6) * 100).toLong()
+    }
+}

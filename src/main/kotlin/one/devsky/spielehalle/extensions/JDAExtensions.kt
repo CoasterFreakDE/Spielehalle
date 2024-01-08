@@ -1,7 +1,9 @@
 package one.devsky.spielehalle.extensions
 
+import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.requests.RestAction
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction
+import one.devsky.spielehalle.utils.Environment
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
@@ -34,3 +36,14 @@ fun <T> RestAction<T>?.queueAfter(duration: Duration) {
 fun String?.asCodeBlock(language: String = "") = "```$language\n$this\n```"
 
 fun Any?.asCodeBlock(language: String = "") = "```$language\n$this\n```"
+
+
+/**
+ * Checks if the member is a VIP based on their roles.
+ *
+ * @return true if the member is a VIP, false otherwise.
+ */
+fun Member.isVIP(): Boolean {
+    val vipRoleIds = Environment.getEnv("VIP_ROLES")?.split(",") ?: return false
+    return this.roles.any { vipRoleIds.contains(it.id) }
+}

@@ -49,12 +49,12 @@ class CoinflipButtonListener: ListenerAdapter() {
             .addField("Guthaben", "$${casinoUser.money + if (result) 5 else -5}".asCodeBlock(), true)
             .build()
 
+        casinoUser.addEXP(if (result) 3 else 1)
         casinoUser = casinoUser.copy(
             money = casinoUser.money + if (result) 5 else -5,
             gamesPlayed = casinoUser.gamesPlayed + 1,
             winnings = casinoUser.winnings + if (result) 5 else 0,
-            losses = casinoUser.losses + if (result) 0 else 5,
-            xp = casinoUser.xp + if (result) 3 else 1
+            losses = casinoUser.losses + if (result) 0 else 5
         )
         CasinoUserCache.saveUser(casinoUser)
         CasinoCache.modifyMoney(if (result) -5.0 else 5.0, Game.COINFLIP, user)

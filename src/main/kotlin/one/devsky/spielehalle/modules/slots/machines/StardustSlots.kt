@@ -126,9 +126,9 @@ class StardustSlots : SlotMachine {
                     updateMessage()
                     return@launch
                 }
+                casinoUser.addEXP(1)
                 CasinoUserCache.saveUser(casinoUser.copy(
                     money = casinoUser.money - einsatz.toDouble(),
-                    xp = casinoUser.xp + 1,
                     gamesPlayed = casinoUser.gamesPlayed + 1
                 ))
                 CasinoCache.modifyMoney(einsatz.toDouble(), Game.SLOTS, player)
@@ -166,7 +166,8 @@ class StardustSlots : SlotMachine {
         if (wins > 0) {
             lastWin = wins
             CasinoCache.modifyMoney(-wins.toDouble(), Game.SLOTS, player)
-            CasinoUserCache.saveUser(casinoUser.copy(money = casinoUser.money + wins, winnings = casinoUser.winnings + wins, xp = casinoUser.xp + (wins / 100)))
+            casinoUser.addEXP(wins / 100)
+            CasinoUserCache.saveUser(casinoUser.copy(money = casinoUser.money + wins, winnings = casinoUser.winnings + wins))
 
             val embed = EmbedBuilder()
                 .setColor(0x4bcffa)
