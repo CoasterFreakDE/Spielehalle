@@ -148,14 +148,17 @@ class StardustSlots : SlotMachine {
         val wins = when {
             same.containsValue(5) -> {
                 val value = same[0] ?: return
+                getLogger().info("${player?.name} got 5x ${reels[0].symbols[value].name} in $name")
                 reels[0].symbols[value].value * 10
             }
             same.containsValue(4) -> {
                 val value = same.first { it.value == 4 }.key
+                getLogger().info("${player?.name} got 4x ${reels[0].symbols[value].name} in $name")
                 reels[0].symbols[value].value * 5
             }
             same.containsValue(3) -> {
                 val value = same.first { it.value == 3 }.key
+                getLogger().info("${player?.name} got 3x ${reels[0].symbols[value].name} in $name")
                 reels[0].symbols[value].value * 2
             }
             else -> 0

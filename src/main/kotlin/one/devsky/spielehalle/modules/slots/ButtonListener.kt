@@ -14,6 +14,14 @@ class ButtonListener : ListenerAdapter() {
             val identifier = componentId.split(".")[1]
             val slotMachine = SlotManager.getSlotMachine(identifier) ?: return
             handleStartButton(event, slotMachine)
+            return@with
+        }
+
+        if (componentId.startsWith("slots.") && componentId.endsWith(".stop")) {
+            val identifier = componentId.split(".")[1]
+            val slotMachine = SlotManager.getSlotMachine(identifier) ?: return
+            handleStopButton(event, slotMachine)
+            return@with
         }
     }
 
@@ -39,5 +47,20 @@ class ButtonListener : ListenerAdapter() {
                     .setMaxValues(1)
                     .build()
             )).queue()
+    }
+
+    private fun handleStopButton(event: ButtonInteractionEvent, slotMachine: SlotMachine) {
+        if (slotMachine.isRunning && slotMachine.player != event.user) {
+            event.reply("Du kannst nicht das Spiel von anderen Spielern unterbrechen.").setEphemeral(true).queue()
+            return
+        }
+
+        if (!slotMachine.isRunning) {
+            event.reply("Es läuft aktuell kein Spiel.").setEphemeral(true).queue()
+            return
+        }
+
+        slotMachine.autoRolls = 1
+        event.reply("${slotMachine.name} wird nach dieser Runde gestoppt.").setEphemeral(true).queue()
     }
 }
