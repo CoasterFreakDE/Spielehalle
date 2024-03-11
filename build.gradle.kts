@@ -39,9 +39,9 @@ val shadowDependencies = listOf(
     "org.mariadb.jdbc:mariadb-java-client:3.3.2",
     "com.zaxxer:HikariCP:5.1.0",
 
-    "io.sentry:sentry:7.1.0",
-    "io.sentry:sentry-kotlin-extensions:7.1.0",
-    "io.sentry:sentry-logback:7.1.0",
+    "io.sentry:sentry:7.6.0",
+    "io.sentry:sentry-kotlin-extensions:7.6.0",
+    "io.sentry:sentry-logback:7.6.0",
 
     "io.javalin:javalin:5.6.3",
 
