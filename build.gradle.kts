@@ -49,7 +49,7 @@ val shadowDependencies = listOf(
     "com.openhtmltopdf:openhtmltopdf-core:1.0.10",
     "com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10",
 
-    "dev.inmo:krontab:2.2.5",
+    "dev.inmo:krontab:2.2.9",
 
     "com.aallam.openai:openai-client:3.6.2",
     "io.ktor:ktor-client-cio:2.3.7",
